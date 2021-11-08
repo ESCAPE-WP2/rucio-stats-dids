@@ -197,7 +197,8 @@ def _print_scope_usage(push_to_es=False, es_url=None):
 
         # experiments provision
         for experiment in experiments:
-            if scope.startswith(experiment):
+            if scope.startswith(
+                    experiment) and "test" not in scope and "TEST" not in scope:
                 experiment_map[experiment]["total_dids_count"] += dids_count
                 experiment_map[experiment]["total_files_count"] += files_count
                 experiment_map[experiment][
