@@ -145,27 +145,23 @@ def _print_scope_usage(push_to_es=False, es_url=None):
     # calculate stats per scope (and keep info for experiments)
     scope_total_used = 0
     for scope in scope_list:
-        filters = {}
 
-        # get scope data from did client
-        dids = list(did_client.list_dids(scope, filters, type='all', long=True))
-        files = list(
-            did_client.list_dids(scope, filters, type='file', long=True))
-        datasets = list(
-            did_client.list_dids(scope, filters, type='dataset', long=True))
-        containers = list(
-            did_client.list_dids(scope, filters, type='container', long=True))
-
-        # calculate total bytes used for files
+        dids_count = 0
+        files_count = 0
+        datasets_count = 0
+        containers_count = 0
         fsize = 0
-        for file in files:
-            fsize += int(file['bytes'])
 
-        # gather counts
-        dids_count = int(len(dids))
-        files_count = int(len(files))
-        datasets_count = int(len(datasets))
-        containers_count = int(len(containers))
+        filters = {"availability": "A"}
+        for did in did_client.list_dids(scope, filters, type='all', long=True):
+            dids_count += 1
+            if did["did_type"] == "FILE":
+                files_count += 1
+                fsize += int(did['bytes'])
+            elif did["did_type"] == "DATASET":
+                datasets_count += 1
+            elif did["did_type"] == "CONTAINER":
+                containers_count += 1
 
         print(
             "\tSCOPE:{} | DIDs:{} | Files:{} ({}) | Datasets:{} | Containers:{}"

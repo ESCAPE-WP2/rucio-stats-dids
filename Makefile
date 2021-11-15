@@ -4,3 +4,5 @@ dry:
 	python rucio_stats_probe.py
 push:
 	python rucio_stats_probe.py --push --url=http://monit-metrics:10012/
+# profile:
+# 	mprof run rucio_stats_probe.py
