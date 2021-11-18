@@ -1,8 +1,8 @@
 format:
-	yapf -i rucio_stats_probe.py --style=google
+	yapf -i rucio_stats_probe_dids.py --style=google
 dry:
-	python rucio_stats_probe.py
+	python rucio_stats_probe_dids.py
 push:
-	python rucio_stats_probe.py --push --url=http://monit-metrics:10012/
+	python rucio_stats_probe_dids.py --push --url=http://monit-metrics:10012/
 # profile:
-# 	mprof run rucio_stats_probe.py
+# 	mprof run rucio_stats_probe_dids.py
