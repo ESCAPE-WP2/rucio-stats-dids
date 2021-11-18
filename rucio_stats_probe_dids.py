@@ -11,6 +11,11 @@ import json
 import time
 import requests
 import argparse
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(message)s',
+                    datefmt='%d/%m/%y %H:%M:%S %Z',
+                    level=logging.INFO)
 
 # global experiment info
 experiments = [
@@ -47,29 +52,29 @@ def _print_rses():
     """
     print rses
     """
-    print("RSES:")
+    logging.info("RSES:")
     rses_list = list(RSEClient().list_rses())
     for rse in rses_list:
-        print("\t" + rse['rse'])
+        logging.info("\t" + rse['rse'])
 
 
 def _print_scopes():
     """
     print scopes
     """
-    print("SCOPES:")
+    logging.info("SCOPES:")
     scope_list = list(ScopeClient().list_scopes())
     for scope in scope_list:
-        print("\t" + scope)
+        logging.info("\t" + scope)
 
 
 def _print_experiments():
     """
     print experiments
     """
-    print("EXPERIMENTS:")
+    logging.info("EXPERIMENTS:")
     for experiment in experiments:
-        print("\t" + experiment)
+        logging.info("\t" + experiment)
 
 
 def _setup_experiments():
@@ -89,7 +94,7 @@ def _print_rse_usage(push_to_es=False, es_url=None):
     """
     print usage of rses, optionally push to an ES datasource
     """
-    print("TOTAL USAGE (RSE):")
+    logging.info("TOTAL USAGE (RSE):")
 
     rses_total_used = 0
     rse_client = RSEClient()
@@ -104,7 +109,7 @@ def _print_rse_usage(push_to_es=False, es_url=None):
             if rse_usage['files'] is None:
                 rse_usage['files'] = 0
 
-            print("\tRSE:{} | Files:{} | Used:{}".format(
+            logging.info("\tRSE:{} | Files:{} | Used:{}".format(
                 rse_name, rse_usage['files'], _pprint_size(rse_usage['used'])))
 
             rses_total_used += rse_usage['used']
@@ -120,7 +125,7 @@ def _print_rse_usage(push_to_es=False, es_url=None):
                 rucio_rse_stats["used_bytes"] = int(rse_usage['used'])
                 _post_to_es(es_url, rucio_rse_stats)
 
-    print("\tRSES TOTAL USED:{}".format(_pprint_size(rses_total_used)))
+    logging.info("\tRSES TOTAL USED:{}".format(_pprint_size(rses_total_used)))
 
     if push_to_es:
         rucio_rse_stats = {}
@@ -136,7 +141,7 @@ def _print_scope_usage(push_to_es=False, es_url=None):
     """
     print usage of scopes, optionally push to ES datasource
     """
-    print("TOTAL USAGE (SCOPE):")
+    logging.info("TOTAL USAGE (SCOPE):")
 
     did_client = DIDClient()
     scope_list = list(ScopeClient().list_scopes())
@@ -163,7 +168,7 @@ def _print_scope_usage(push_to_es=False, es_url=None):
             elif did["did_type"] == "CONTAINER":
                 containers_count += 1
 
-        print(
+        logging.info(
             "\tSCOPE:{} | DIDs:{} | Files:{} ({}) | Datasets:{} | Containers:{}"
             .format(scope, dids_count, files_count, _pprint_size(fsize),
                     datasets_count, containers_count))
@@ -173,7 +178,7 @@ def _print_scope_usage(push_to_es=False, es_url=None):
         # consistency check
         all_dids_count = files_count + datasets_count + containers_count
         if dids_count != all_dids_count:
-            print(
+            logging.info(
                 "\t>> Inconsistent number of DIDS | dids_count:{} != all_dids_count:{} <<"
                 .format(dids_count, all_dids_count))
 
@@ -203,7 +208,8 @@ def _print_scope_usage(push_to_es=False, es_url=None):
                     "total_containers_count"] += containers_count
                 experiment_map[experiment]["total_files_bytes"] += fsize
 
-    print("\tSCOPES TOTAL USED:{}".format(_pprint_size(scope_total_used)))
+    logging.info("\tSCOPES TOTAL USED:{}".format(
+        _pprint_size(scope_total_used)))
 
     if push_to_es:
         rucio_scope_stats = {}
@@ -219,7 +225,7 @@ def _print_experiment_usage(push_to_es=False, es_url=None):
     """
     print usage of experiments, optionally push to ES datasource
     """
-    print("TOTAL USAGE (EXPERIMENT):")
+    logging.info("TOTAL USAGE (EXPERIMENT):")
 
     experiment_total_used = 0
 
@@ -232,7 +238,7 @@ def _print_experiment_usage(push_to_es=False, es_url=None):
         containers_count = experiment_map[experiment]["total_containers_count"]
         files_bytes = experiment_map[experiment]["total_files_bytes"]
 
-        print(
+        logging.info(
             "\tEXPERIMENT:{} | DIDs:{} | Files:{} ({}) | Datasets:{} | Containers:{}"
             .format(experiment, dids_count, files_count,
                     _pprint_size(files_bytes), datasets_count,
@@ -254,7 +260,7 @@ def _print_experiment_usage(push_to_es=False, es_url=None):
             rucio_experiment_stats["total_files_bytes"] = files_bytes
             _post_to_es(es_url, rucio_experiment_stats)
 
-    print("\tEXPERIMENTS TOTAL USED:{}".format(
+    logging.info("\tEXPERIMENTS TOTAL USED:{}".format(
         _pprint_size(experiment_total_used)))
 
     if push_to_es:
