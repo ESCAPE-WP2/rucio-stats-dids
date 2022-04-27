@@ -158,14 +158,17 @@ def _print_scope_usage(push_to_es=False, es_url=None):
         fsize = 0
 
         filters = {"availability": "A"}
-        for did in did_client.list_dids(scope, filters, type='all', long=True):
+        for did in did_client.list_dids(scope,
+                                        filters,
+                                        did_type='all',
+                                        long=True):
             dids_count += 1
-            if did["did_type"] == "FILE":
+            if did["did_type"] == "DIDType.FILE":
                 files_count += 1
                 fsize += int(did['bytes'])
-            elif did["did_type"] == "DATASET":
+            elif did["did_type"] == "DIDType.DATASET":
                 datasets_count += 1
-            elif did["did_type"] == "CONTAINER":
+            elif did["did_type"] == "DIDType.CONTAINER":
                 containers_count += 1
 
         logging.info(
