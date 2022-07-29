@@ -9,7 +9,7 @@ jsonschema==3.2.0
 pbr==5.8.1
 pyrsistent==0.18.0
 requests==2.27.1
-rucio-clients==1.28.0
+rucio-clients==1.29.0
 six==1.16.0
 stevedore==3.5.0
 tabulate==0.8.9
